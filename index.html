@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Abracadabra Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grandstander:wght@600;800;900&family=Lexend:wght@400;500;700&display=swap">
+<style>
+/* Layout: one centered column on a night-time stage; levels stack like playing-card suits, each trick opens as its own lesson page. Single deliberate dark "stage" look. */
+:root {
+  --stage: #141a3a;        /* midnight theatre */
+  --stage-2: #1d2552;      /* raised panels */
+  --curtain: #c8323f;      /* playing-card red */
+  --spot: #ffcf4a;         /* spotlight gold */
+  --chalk: #f5f1ff;        /* main text */
+  --mist: #a9b0dd;         /* quiet text */
+  --line: #2f3a78;
+  --good: #5fd39a;
+  --display: "Grandstander", "Comic Sans MS", "Chalkboard SE", system-ui, sans-serif;
+  --body: "Lexend", "Trebuchet MS", system-ui, sans-serif;
+  --r: 18px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--stage);
+  background-image: radial-gradient(ellipse 70% 40% at 50% 0%, #2a3478 0%, transparent 70%);
+  background-repeat: no-repeat;
+  color: var(--chalk);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.55;
+  min-height: 100%;
+}
+.wrap { max-width: 760px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 60px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.1; text-wrap: balance; margin: 0; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--spot); outline-offset: 2px; }
+
+/* ---------- header ---------- */
+.marquee { text-align: center; padding-block: 12px 8px; display: grid; gap: 10px; justify-items: center; }
+.bulbs { display: flex; gap: 10px; justify-content: center; }
+.bulbs i { width: 9px; height: 9px; border-radius: 50%; background: var(--spot); box-shadow: 0 0 10px var(--spot); animation: blink 1.6s infinite; }
+.bulbs i:nth-child(even) { animation-delay: .8s; }
+@keyframes blink { 50% { opacity: .35; } }
+.marquee h1 { font-size: clamp(2.2rem, 8vw, 3.6rem); font-weight: 900; color: var(--spot); letter-spacing: .01em; text-shadow: 0 3px 0 var(--curtain); }
+.marquee p { margin: 0; color: var(--mist); max-width: 34em; }
+
+.badge-row { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 18px; }
+.who {
+  display: grid; gap: 4px; background: var(--stage-2); border: 2px solid var(--line);
+  border-radius: var(--r); padding: 10px 14px; min-width: 0; flex: 1 1 200px;
+}
+.who label { font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: var(--mist); }
+.who input {
+  background: transparent; border: 0; border-bottom: 2px dashed var(--line); color: var(--chalk);
+  font-family: var(--display); font-weight: 800; font-size: 1.3rem; padding: 2px 0; width: 100%; min-width: 0;
+}
+.rank {
+  flex: 1 1 200px; border-radius: var(--r); padding: 10px 14px; background: var(--curtain);
+  display: grid; gap: 2px; align-content: center;
+}
+.rank small { font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; opacity: .85; }
+.rank b { font-family: var(--display); font-size: 1.3rem; font-weight: 800; }
+.rank span { font-size: .9rem; font-variant-numeric: tabular-nums; }
+
+/* ---------- levels ---------- */
+.levels { display: grid; gap: 28px; margin-top: 34px; }
+.level-head { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+.suit {
+  flex: none; width: 54px; height: 70px; border-radius: 9px; background: var(--chalk);
+  display: grid; place-items: center; font-size: 2rem; line-height: 1;
+  box-shadow: 0 4px 0 rgba(0,0,0,.35); transform: rotate(-6deg);
+}
+.suit.red { color: var(--curtain); } .suit.black { color: var(--stage); }
+.level-head h2 { font-size: 1.6rem; font-weight: 800; }
+.level-head p { margin: 2px 0 0; color: var(--mist); font-size: .92rem; }
+.level.locked .level-head h2 { color: var(--mist); }
+.lock-note {
+  border: 2px dashed var(--line); border-radius: var(--r); padding: 14px 16px; color: var(--mist);
+  display: flex; gap: 12px; align-items: center;
+}
+.lock-note svg { flex: none; }
+
+.tricks { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.trick-card {
+  text-align: left; background: var(--stage-2); border: 2px solid var(--line); border-radius: var(--r);
+  padding: 14px 16px; display: grid; gap: 8px; transition: transform .15s, border-color .15s;
+}
+.trick-card:hover { transform: translateY(-3px); border-color: var(--spot); }
+.trick-card h3 { font-size: 1.25rem; font-weight: 800; }
+.trick-card p { margin: 0; color: var(--mist); font-size: .9rem; }
+.trick-card.done { border-color: var(--good); }
+.stars { display: flex; gap: 4px; }
+.star { width: 22px; height: 22px; }
+.star path { fill: var(--line); }
+.star.on path { fill: var(--spot); }
+.done-tag { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--good); font-weight: 700; }
+
+.code {
+  margin-top: 40px; background: var(--chalk); color: var(--stage); border-radius: var(--r);
+  padding: 18px 20px; transform: rotate(-.6deg);
+}
+.code h2 { font-size: 1.4rem; color: var(--curtain); margin-bottom: 8px; }
+.code ol { margin: 0; padding-left: 1.3em; display: grid; gap: 4px; }
+
+.foot { margin-top: 36px; text-align: center; color: var(--mist); font-size: .85rem; display: grid; gap: 10px; justify-items: center; }
+.link-btn { background: none; border: 0; color: var(--mist); text-decoration: underline; padding: 4px; }
+.confirm { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; }
+
+/* ---------- lesson page ---------- */
+.back {
+  background: var(--stage-2); border: 2px solid var(--line); border-radius: 999px; padding: 8px 16px;
+  font-weight: 500; display: inline-flex; gap: 8px; align-items: center;
+}
+.lesson-top { margin-top: 18px; display: grid; gap: 8px; }
+.lesson-top .eyebrow { font-size: .78rem; text-transform: uppercase; letter-spacing: .12em; color: var(--spot); font-weight: 700; }
+.lesson-top h2 { font-size: clamp(2rem, 7vw, 2.8rem); font-weight: 900; }
+.lesson-top p { margin: 0; color: var(--mist); font-size: 1.05rem; }
+
+.panel { background: var(--stage-2); border: 2px solid var(--line); border-radius: var(--r); padding: 16px 18px; margin-top: 16px; }
+.panel h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: 8px; color: var(--spot); }
+.need { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.need li { background: var(--stage); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: .95rem; }
+
+.secret-box { position: relative; }
+.secret-cover {
+  width: 100%; border: 0; border-radius: 12px; padding: 22px 16px; background: repeating-linear-gradient(45deg, var(--curtain) 0 14px, #b02a36 14px 28px);
+  font-family: var(--display); font-weight: 800; font-size: 1.25rem; color: var(--chalk); display: grid; gap: 2px;
+}
+.secret-cover small { font-family: var(--body); font-weight: 400; font-size: .85rem; opacity: .9; }
+.secret-text { margin: 0; font-size: 1.05rem; }
+
+.steps { margin: 0; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 12px; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 38px 1fr; gap: 12px; align-items: start; }
+.steps li::before {
+  content: counter(s); width: 38px; height: 38px; border-radius: 50%; background: var(--spot); color: var(--stage);
+  font-family: var(--display); font-weight: 900; font-size: 1.1rem; display: grid; place-items: center;
+}
+.steps li span { min-width: 0; padding-top: 5px; }
+
+.say { background: var(--spot); color: var(--stage); border-color: var(--spot); }
+.say h3 { color: var(--curtain); }
+.say p { margin: 0; font-family: var(--display); font-weight: 800; font-size: 1.35rem; line-height: 1.3; }
+.dad { border-style: dashed; }
+.dad h3 { color: var(--chalk); }
+.dad p { margin: 0; color: var(--mist); }
+
+.progress { margin-top: 22px; display: grid; gap: 10px; }
+.progress h3 { font-size: 1.3rem; font-weight: 800; text-align: center; }
+.goal {
+  display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center;
+  background: var(--stage-2); border: 2px solid var(--line); border-radius: var(--r); padding: 12px 14px;
+}
+.goal.on { border-color: var(--spot); }
+.goal .star { width: 40px; height: 40px; }
+.goal .txt { min-width: 0; }
+.goal .txt b { display: block; font-weight: 700; }
+.goal .txt small { color: var(--mist); }
+.btn {
+  border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700; background: var(--curtain); color: var(--chalk);
+  white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+.btn.ghost { background: transparent; border: 2px solid var(--line); color: var(--mist); }
+.btn.gold { background: var(--spot); color: var(--stage); }
+.mastered {
+  text-align: center; padding: 18px; border-radius: var(--r); background: var(--good); color: var(--stage);
+  font-family: var(--display); font-weight: 900; font-size: 1.5rem;
+}
+.nav-row { display: flex; justify-content: space-between; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+  background: var(--spot); color: var(--stage); font-family: var(--display); font-weight: 900; font-size: 1.2rem;
+  padding: 12px 22px; border-radius: 999px; box-shadow: 0 8px 30px rgba(0,0,0,.5); max-width: calc(100% - 32px); text-align: center;
+}
+#sparkles { position: fixed; inset: 0; pointer-events: none; width: 100%; height: 100%; }
+
+@media (max-width: 480px) {
+  .goal { grid-template-columns: 34px 1fr; }
+  .goal .star { width: 32px; height: 32px; }
+  .goal .btn { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bulbs i { animation: none; }
+  .trick-card { transition: none; }
+}
+</style>
+</head>
+<body>
+<canvas id="sparkles" aria-hidden="true"></canvas>
+<div class="wrap">
+
+  <!-- HOME -->
+  <main id="home">
+    <header class="marquee">
+      <div class="bulbs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <h1>Abracadabra Academy</h1>
+      <p>Learn a trick together. Practice it three times. Show it to someone. Earn all three stars and the next door opens.</p>
+    </header>
+
+    <div class="badge-row">
+      <div class="who">
+        <label for="magName">Magician name</label>
+        <input id="magName" maxlength="28" placeholder="The Amazing ...">
+      </div>
+      <div class="who">
+        <label for="magWord">Magic word</label>
+        <input id="magWord" maxlength="20" placeholder="Abracadabra">
+      </div>
+      <div class="rank">
+        <small>Rank</small>
+        <b id="rankName">Apprentice</b>
+        <span id="starCount">0 of 36 stars</span>
+      </div>
+    </div>
+
+    <section class="levels" id="levels"></section>
+
+    <section class="code">
+      <h2>The Magician's Code</h2>
+      <ol>
+        <li>Never tell the secret. Not even to your best friend.</li>
+        <li>Practice until it feels easy, then practice once more.</li>
+        <li>Never do the same trick twice for the same person.</li>
+        <li>Always say your magic word.</li>
+        <li>Take a big bow at the end.</li>
+      </ol>
+    </section>
+
+    <footer class="foot">
+      <span>Progress saves on this device.</span>
+      <button class="link-btn" id="resetBtn" type="button">Start over</button>
+      <div class="confirm" id="resetConfirm" hidden>
+        <span>Erase all stars?</span>
+        <button class="btn" id="resetYes" type="button">Yes, erase</button>
+        <button class="btn ghost" id="resetNo" type="button">Keep them</button>
+      </div>
+    </footer>
+  </main>
+
+  <!-- LESSON -->
+  <article id="lesson" hidden></article>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+const LEVELS = [
+  { id: 1, name: "Apprentice", suit: "♣", color: "black", blurb: "Easy tricks to get the magic started." },
+  { id: 2, name: "Sorcerer's Helper", suit: "♦", color: "red", blurb: "Hidden coins, jumping bands and mind reading." },
+  { id: 3, name: "Wizard", suit: "♥", color: "red", blurb: "Floating cups, linking clips and card tricks." },
+  { id: 4, name: "Grand Magician", suit: "♠", color: "black", blurb: "The big stage tricks. Take your time." }
+];
+
+const TRICKS = [
+  // ---------- Level 1 ----------
+  { id: "pencil", level: 1, name: "The Rubber Pencil",
+    hook: "A hard pencil turns wobbly like rubber.",
+    need: ["A pencil"],
+    secret: "Your eyes play the trick! When you hold a pencil loosely and wiggle it up and down fast, it looks like it is bending. It never really bends.",
+    steps: [
+      "Hand the pencil to your friend. Let them tap it on the table. It's hard!",
+      "Take it back. Hold it near the eraser end, loosely, between your thumb and pointer finger.",
+      "Move your hand up and down in small, fast wiggles. Let the pencil flop a little.",
+      "Watch it go wobbly like rubber!",
+      "Stop, and hand it back. \"All better now.\""
+    ],
+    say: "This is a normal pencil. But when I say {word}... it turns to rubber!",
+    dad: "Practice in front of a mirror together so he can see what the audience sees. It looks best from a few steps away." },
+  { id: "thumb", level: 1, name: "The Stolen Thumb",
+    hook: "Pull off your own thumb, then put it back.",
+    need: ["Your two hands"],
+    secret: "Bend your left thumb down at the knuckle. Bend your right thumb too, and put its tip right next to the bent left thumb. Cover the place where they meet with your right pointer finger. It looks like one long thumb!",
+    steps: [
+      "Show your left hand. Say your thumb feels a bit loose today.",
+      "Turn a little and set up the secret thumb shape.",
+      "Slide your right hand along your left hand. The thumb comes off!",
+      "Slide it back, wiggle your left thumb, and say \"Phew!\""
+    ],
+    say: "Ouch! My thumb is loose... {word}! Got it back!",
+    dad: "The silly faces and \"ouch!\" sell this one more than the hands do. Ham it up together. Audience stays in front." },
+  { id: "pepper", level: 1, name: "Run-Away Pepper",
+    hook: "Pepper floating on water runs away from your magic finger.",
+    need: ["A plate", "Water", "Ground pepper", "A drop of dish soap"],
+    secret: "Before the show, put a tiny dab of soap on one fingertip. That is your magic finger. Soap breaks the water's stretchy skin, and the pepper zooms away.",
+    steps: [
+      "Pour a little water into the plate.",
+      "Sprinkle pepper all over the top.",
+      "Touch the middle with a normal finger. Nothing happens. \"Hmm, wrong finger.\"",
+      "Say your magic word and touch the middle with your magic finger.",
+      "The pepper runs to the edges!"
+    ],
+    say: "Pepper is scared of magicians. Watch it run when I say {word}!",
+    dad: "You handle the soap. Afterwards, tell him the real science in private (surface tension). It's his first secret that's also a fact." },
+
+  // ---------- Level 2 ----------
+  { id: "ear", level: 2, name: "Coin From the Ear",
+    hook: "Find a coin hiding behind someone's ear.",
+    need: ["A big coin"],
+    secret: "Before you start, hide the coin in your curled fingers. Keep your hand relaxed by your side. Nobody knows it's there.",
+    steps: [
+      "Tuck the coin into your curled fingers. Let your hand hang easy.",
+      "Look at your friend's ear with a surprised face. \"Wait... what's that?\"",
+      "Reach behind their ear. Push the coin up to your fingertips with your thumb.",
+      "Bring it out and show it. Ta-da!"
+    ],
+    say: "Do you know you have money in your ear? Hold still... {word}!",
+    dad: "A quarter or a big coin is easier for small hands. He can practice the hidden hold while watching TV." },
+  { id: "band", level: 2, name: "The Jumping Rubber Band",
+    hook: "A band jumps from two fingers to the other two.",
+    need: ["A loose rubber band"],
+    secret: "When you close your hand, sneak all four fingertips inside the band. When you open your hand fast, the band jumps over by itself.",
+    steps: [
+      "Put the band around your pointer and middle finger, down at the bottom.",
+      "Show the back of your hand to your friend.",
+      "With your other hand, pull the band toward you and close your fist, slipping all four fingertips inside the band.",
+      "Let go. From the front it still looks like it's on two fingers.",
+      "Say your magic word and open your hand fast. It jumps to the other two fingers!"
+    ],
+    say: "This band is on these two fingers. But on {word}... it jumps!",
+    dad: "Use a loose band, not a tight one. Your friend should only ever see the back of the hand." },
+  { id: "crayon", level: 2, name: "Crayon Mind Reader",
+    hook: "Name a hidden crayon's color without looking.",
+    need: ["A box of crayons"],
+    secret: "Behind your back, scratch the crayon with your thumbnail. When you bring that hand up to your forehead to \"read their mind,\" peek at the color on your nail.",
+    steps: [
+      "Turn around. Your friend puts any crayon into your hands behind your back.",
+      "Turn back to face them. Keep your hands behind you.",
+      "Scratch a little crayon onto your thumbnail.",
+      "Bring that hand up to your forehead. \"I'm reading your mind...\" Sneak a peek at your nail.",
+      "Say the color, then show the crayon!"
+    ],
+    say: "Think of the color really hard. Harder! {word}... I see it!",
+    dad: "Dark colors show up best on a nail. Remind him to wipe his nail before doing it again." },
+
+  // ---------- Level 3 ----------
+  { id: "cup", level: 3, name: "The Floating Cup",
+    hook: "A cup floats in front of your hand.",
+    need: ["A paper cup", "A pencil (to poke a hole)"],
+    secret: "There's a small hole in the back of the cup. Your thumb goes in the hole and holds the cup while your fingers spread out wide.",
+    steps: [
+      "Grown-up pokes a thumb-sized hole near the bottom of the cup's back.",
+      "Hold the cup with both hands, hole facing you. Slip your thumb into the hole.",
+      "Take your other hand away. Slowly open your fingers wide.",
+      "Move the cup up and down a little. It floats!",
+      "Grab it with both hands and take a bow."
+    ],
+    say: "This cup can fly. It just needs the magic word. {word}!",
+    dad: "Do the hole yourself. Keep the audience in front so nobody sees the thumb." },
+  { id: "clips", level: 3, name: "Linking Paper Clips",
+    hook: "Two clips jump off paper and link together in the air.",
+    need: ["A strip of paper (dollar-bill size)", "2 paper clips"],
+    secret: "There's no sleight of hand. The S-fold does all the work. When you pull the ends, the clips lock into each other.",
+    steps: [
+      "Fold the paper into three parts, like the letter S when you look down from the top.",
+      "Clip clip #1 at the top edge, joining the front part and the middle part.",
+      "Clip clip #2 at the top edge on the other side, joining the middle part and the back part.",
+      "Hold both ends of the paper and say your magic word.",
+      "Pull the ends apart fast. The clips fly off, linked together!"
+    ],
+    say: "These clips are not friends. But on {word}... they hold hands!",
+    dad: "Build this one together the first few times. The pull has to be quick and strong. Paper strips beat real money for practice." },
+  { id: "card", level: 3, name: "Find Your Card",
+    hook: "Your friend picks any card. You find it.",
+    need: ["A deck of cards"],
+    secret: "Peek at the bottom card and remember it. That's your key card. Your friend's card will end up right next to it.",
+    steps: [
+      "Shuffle the cards. Sneak a peek at the bottom card and remember it.",
+      "Fan the cards. Your friend picks any card, looks at it, and remembers it.",
+      "They put their card on top of the deck.",
+      "They cut the deck: take the top half off, put the bottom half on top of it.",
+      "Spread the cards face up. Their card is the one right after your key card!"
+    ],
+    say: "Pick any card. Don't show me! Now let me find it... {word}!",
+    dad: "Kid-sized cards help. Pick an easy key card he can say out loud in his head, like the 5 of hearts." },
+
+  // ---------- Level 4 ----------
+  { id: "string", level: 4, name: "Cut & Restored String",
+    hook: "Cut a string in half, then it's whole again.",
+    need: ["A plain drinking straw", "String longer than the straw", "Kid scissors"],
+    secret: "There's a secret slit cut along the middle of the straw. When you bend the straw, you pull the string out of the slit and hide it under your fingers. The scissors only cut the straw.",
+    steps: [
+      "Grown-up cuts a slit about 5 cm long in the middle of the straw, on one side.",
+      "Push the string through the straw so it hangs out both ends.",
+      "Bend the straw in half with the slit facing you. Pull both string ends down so the string pops out of the slit.",
+      "Hold the bend so your fingers hide the string. Have your friend cut through the straw above your fingers.",
+      "Say your magic word, then slowly pull one end. The string comes out in one piece!"
+    ],
+    say: "Two pieces of straw. Two pieces of string? Not after {word}!",
+    dad: "You make the slit with a craft knife. Practice the bend-and-pull until he can do it without looking." },
+  { id: "21", level: 4, name: "The 21 Card Trick",
+    hook: "Find a card using nothing but counting.",
+    need: ["21 cards from a deck"],
+    secret: "It's a counting trick. After three deals, your friend's card is always the 11th card. Always!",
+    steps: [
+      "Deal 21 cards face up into 3 columns, going across row by row, 7 rows.",
+      "Your friend picks a card in their head and tells you which column it's in.",
+      "Pick up each column. Put their column in the middle of the other two.",
+      "Deal and ask again. Do this 3 times in total.",
+      "Count down to the 11th card. That's their card!"
+    ],
+    say: "Just tell me the column. The cards will tell me the rest. {word}!",
+    dad: "Great counting practice. Sit beside him for the first few runs and count the 11 together." },
+  { id: "vanish", level: 4, name: "The Vanishing Coin",
+    hook: "Take a coin in your hand. Open it. Gone!",
+    need: ["A coin"],
+    secret: "You only pretend to take the coin. It quietly drops into your other hand. Your eyes follow the empty hand, so everyone else's eyes do too.",
+    steps: [
+      "Hold the coin in your left hand between your thumb and fingers, so everyone can see it.",
+      "Bring your right hand over as if to grab it.",
+      "As your right hand covers it, let the coin drop into your left palm. Curl those fingers.",
+      "Close your right hand like it's holding the coin. Move it away and look at it.",
+      "Drop your left hand to your side. Say the word and open your right hand. Gone!"
+    ],
+    say: "This coin is in my hand. Watch closely... {word}! Where did it go?",
+    dad: "The hardest one in the book. Real magicians practice this for weeks. The secret inside the secret is where he looks." }
+];
+
+const STORE_KEY = "abracadabra-academy-v1";
+const UNLOCK_NEED = 2; // mastered tricks per level to open the next
+
+let state = load();
+
+function blankState() { return { name: "", word: "", tricks: {} }; }
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) return Object.assign(blankState(), JSON.parse(raw));
+  } catch (e) {}
+  return blankState();
+}
+function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} }
+
+function tp(id) { return state.tricks[id] || (state.tricks[id] = { secret: false, practice: 0, shown: false }); }
+function starsFor(id) { const t = state.tricks[id]; if (!t) return 0; return (t.secret ? 1 : 0) + (t.practice >= 3 ? 1 : 0) + (t.shown ? 1 : 0); }
+function mastered(id) { return starsFor(id) === 3; }
+function masteredIn(level) { return TRICKS.filter(t => t.level === level && mastered(t.id)).length; }
+function unlocked(level) { return level === 1 || masteredIn(level - 1) >= UNLOCK_NEED; }
+function topLevel() { let l = 1; while (l < LEVELS.length && unlocked(l + 1)) l++; return l; }
+function magicWord() { return (state.word || "").trim() || "Abracadabra"; }
+
+const STAR_PATH = "M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z";
+function star(on) { return `<svg class="star${on ? " on" : ""}" viewBox="0 0 24 24" aria-hidden="true"><path d="${STAR_PATH}"/></svg>`; }
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+// ---------- home ----------
+function renderHome() {
+  const total = TRICKS.reduce((n, t) => n + starsFor(t.id), 0);
+  document.getElementById("starCount").textContent = `${total} of ${TRICKS.length * 3} stars`;
+  const allDone = TRICKS.every(t => mastered(t.id));
+  document.getElementById("rankName").textContent = allDone ? "Master Magician" : LEVELS[topLevel() - 1].name;
+
+  document.getElementById("levels").innerHTML = LEVELS.map(L => {
+    const open = unlocked(L.id);
+    const head = `<div class="level-head"><div class="suit ${L.color}" aria-hidden="true">${L.suit}</div>
+      <div><h2>Level ${L.id}: ${L.name}</h2><p>${L.blurb}</p></div></div>`;
+    if (!open) {
+      const prev = LEVELS[L.id - 2];
+      const left = UNLOCK_NEED - masteredIn(L.id - 1);
+      return `<div class="level locked">${head}<div class="lock-note">
+        <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2" fill="currentColor"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2.2" fill="none"/></svg>
+        <span>Master ${left} more ${left === 1 ? "trick" : "tricks"} in ${prev.name} to open this door.</span></div></div>`;
+    }
+    const cards = TRICKS.filter(t => t.level === L.id).map(t => {
+      const s = starsFor(t.id);
+      return `<button class="trick-card${s === 3 ? " done" : ""}" data-trick="${t.id}" type="button">
+        <h3>${esc(t.name)}</h3><p>${esc(t.hook)}</p>
+        <div class="stars">${star(s > 0)}${star(s > 1)}${star(s > 2)}</div>
+        ${s === 3 ? '<span class="done-tag">Mastered</span>' : ""}</button>`;
+    }).join("");
+    return `<div class="level">${head}<div class="tricks">${cards}</div></div>`;
+  }).join("");
+}
+
+// ---------- lesson ----------
+let current = null;
+const peeked = new Set(); // secrets uncovered this visit
+function openTrick(id) {
+  current = id;
+  renderLesson();
+  document.getElementById("home").hidden = true;
+  document.getElementById("lesson").hidden = false;
+  window.scrollTo(0, 0);
+}
+function closeTrick() {
+  current = null;
+  document.getElementById("lesson").hidden = true;
+  document.getElementById("home").hidden = false;
+  renderHome();
+  window.scrollTo(0, 0);
+}
+
+function renderLesson() {
+  const t = TRICKS.find(x => x.id === current);
+  const L = LEVELS[t.level - 1];
+  const p = tp(t.id);
+  const word = esc(magicWord());
+  const say = esc(t.say).replace("{word}", `<u>${word}</u>`);
+  const sameLevel = TRICKS.filter(x => x.level === t.level);
+  const idx = TRICKS.indexOf(t);
+  const next = TRICKS[idx + 1] && unlocked(TRICKS[idx + 1].level) ? TRICKS[idx + 1] : null;
+
+  document.getElementById("lesson").innerHTML = `
+    <button class="back" id="backBtn" type="button">&larr; All tricks</button>
+    <div class="lesson-top">
+      <span class="eyebrow">${L.suit} Level ${L.id} &middot; ${L.name} &middot; Trick ${sameLevel.indexOf(t) + 1} of ${sameLevel.length}</span>
+      <h2>${esc(t.name)}</h2>
+      <p>${esc(t.hook)}</p>
+    </div>
+
+    <section class="panel"><h3>You need</h3>
+      <ul class="need">${t.need.map(n => `<li>${esc(n)}</li>`).join("")}</ul></section>
+
+    <section class="panel secret-box"><h3>The secret</h3>
+      ${p.secret || peeked.has(t.id)
+        ? `<p class="secret-text">${esc(t.secret)}</p>`
+        : `<button class="secret-cover" id="peek" type="button">Tap to see the secret<small>Only magicians allowed. Check nobody is watching!</small></button>`}
+    </section>
+
+    <section class="panel"><h3>How to do it</h3>
+      <ol class="steps">${t.steps.map(s => `<li><span>${esc(s)}</span></li>`).join("")}</ol></section>
+
+    <section class="panel say"><h3>Say this</h3><p>&ldquo;${say}&rdquo;</p></section>
+
+    <section class="panel dad"><h3>Tip for Dad</h3><p>${esc(t.dad)}</p></section>
+
+    <section class="progress">
+      <h3>Earn your stars</h3>
+      <div class="goal${p.secret ? " on" : ""}">${star(p.secret)}
+        <div class="txt"><b>I know the secret</b><small>Read it and keep it safe.</small></div>
+        <button class="btn${p.secret ? " ghost" : ""}" data-act="secret" type="button">${p.secret ? "Got it" : "I know it!"}</button></div>
+      <div class="goal${p.practice >= 3 ? " on" : ""}">${star(p.practice >= 3)}
+        <div class="txt"><b>Practice 3 times</b><small>${Math.min(p.practice, 3)} of 3 done${p.practice > 3 ? ` (${p.practice} total)` : ""}</small></div>
+        <button class="btn${p.practice >= 3 ? " ghost" : ""}" data-act="practice" type="button">+1 practice</button></div>
+      <div class="goal${p.shown ? " on" : ""}">${star(p.shown)}
+        <div class="txt"><b>Show someone</b><small>Mom, Grandpa, a friend, the dog.</small></div>
+        <button class="btn${p.shown ? " ghost" : " gold"}" data-act="shown" type="button">${p.shown ? "Shown!" : "I did it!"}</button></div>
+      ${mastered(t.id) ? `<div class="mastered">Trick mastered!</div>` : ""}
+    </section>
+
+    <div class="nav-row">
+      <button class="back" data-go="home" type="button">&larr; All tricks</button>
+      ${next ? `<button class="back" data-go="${next.id}" type="button">Next: ${esc(next.name)} &rarr;</button>` : ""}
+    </div>`;
+}
+
+document.getElementById("lesson").addEventListener("click", e => {
+  const el = e.target.closest("button");
+  if (!el) return;
+  if (el.id === "backBtn" || el.dataset.go === "home") return closeTrick();
+  if (el.dataset.go) return openTrick(el.dataset.go);
+  const p = tp(current);
+  if (el.id === "peek") { peeked.add(current); renderLesson(); return; }
+  const before = { star: starsFor(current), done: mastered(current), levels: LEVELS.map(L => unlocked(L.id)) };
+  const act = el.dataset.act;
+  if (act === "secret") { p.secret = !p.secret; peeked.add(current); }
+  if (act === "practice") p.practice += 1;
+  if (act === "shown") p.shown = !p.shown;
+  save();
+  renderLesson();
+  const after = starsFor(current);
+  const newLevel = LEVELS.find((L, i) => !before.levels[i] && unlocked(L.id));
+  if (newLevel) { celebrate(120); toast(`New level open: ${newLevel.name}!`); }
+  else if (!before.done && mastered(current)) { celebrate(90); toast("Trick mastered! Take a bow!"); }
+  else if (after > before.star) { celebrate(30); toast("You earned a star!"); }
+});
+
+document.getElementById("levels").addEventListener("click", e => {
+  const el = e.target.closest("[data-trick]");
+  if (el) openTrick(el.dataset.trick);
+});
+
+// ---------- name + word ----------
+const nameIn = document.getElementById("magName");
+const wordIn = document.getElementById("magWord");
+nameIn.value = state.name; wordIn.value = state.word;
+nameIn.addEventListener("input", () => { state.name = nameIn.value; save(); });
+wordIn.addEventListener("input", () => { state.word = wordIn.value; save(); });
+
+// ---------- reset ----------
+const resetConfirm = document.getElementById("resetConfirm");
+document.getElementById("resetBtn").addEventListener("click", () => { resetConfirm.hidden = false; });
+document.getElementById("resetNo").addEventListener("click", () => { resetConfirm.hidden = true; });
+document.getElementById("resetYes").addEventListener("click", () => {
+  state = blankState(); save(); nameIn.value = ""; wordIn.value = ""; resetConfirm.hidden = true; renderHome();
+});
+
+// ---------- toast + sparkles ----------
+let toastTimer;
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 2400);
+}
+const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const cv = document.getElementById("sparkles"), cx = cv.getContext("2d");
+let bits = [], raf = null;
+function celebrate(n) {
+  if (reduce) return;
+  cv.width = innerWidth; cv.height = innerHeight;
+  const colors = ["#ffcf4a", "#c8323f", "#f5f1ff", "#5fd39a"];
+  for (let i = 0; i < n; i++) bits.push({
+    x: innerWidth / 2 + (Math.random() - .5) * 120, y: innerHeight * .6,
+    vx: (Math.random() - .5) * 12, vy: -Math.random() * 14 - 6,
+    r: Math.random() * 6 + 4, c: colors[i % colors.length], a: Math.random() * 6, life: 1
+  });
+  if (!raf) raf = requestAnimationFrame(tick);
+}
+function tick() {
+  cx.clearRect(0, 0, cv.width, cv.height);
+  bits.forEach(b => {
+    b.x += b.vx; b.y += b.vy; b.vy += .45; b.a += .15; b.life -= .012;
+    cx.save(); cx.translate(b.x, b.y); cx.rotate(b.a); cx.globalAlpha = Math.max(b.life, 0); cx.fillStyle = b.c;
+    cx.beginPath();
+    for (let k = 0; k < 10; k++) { const rr = k % 2 ? b.r * .45 : b.r, an = k * Math.PI / 5; cx.lineTo(Math.cos(an) * rr, Math.sin(an) * rr); }
+    cx.closePath(); cx.fill(); cx.restore();
+  });
+  bits = bits.filter(b => b.life > 0 && b.y < cv.height + 40);
+  raf = bits.length ? requestAnimationFrame(tick) : (cx.clearRect(0, 0, cv.width, cv.height), null);
+}
+
+renderHome();
+</script>
+</body>
+</html>
